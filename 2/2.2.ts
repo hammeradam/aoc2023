@@ -1,27 +1,35 @@
 import { readFileSync } from 'fs';
 
-const file = readFileSync('1/input.txt').toString();
+const file = readFileSync('./2/input.txt').toString();
+const games = file.split('\n');
+let sum = 0;
 
-const map = {
-  one: '1',
-  two: '2',
-  three: '3',
-  four: '4',
-  five: '5',
-  six: '6',
-  seven: '7',
-  eight: '8',
-  nine: '9',
-};
+for (let game of games) {
+  const rounds = game
+    .split(':')[1]
+    .split(';')
+    .map((draw) => draw.split(',').map((i) => i.trim().split(' ')));
 
-console.log(
-  file
-    .split('\n')
-    .map((line) =>
-      Array.from(line
-        .matchAll(/(?=(one|two|three|four|five|six|seven|eight|nine|\d))/g)).map(x => x[1])
-        ?.map((item) => map[item] ?? item)
-    )
-    .map((arr) => Number.parseInt(arr!.at(0)?.toString()! + arr!.at(arr?.length - 1)?.toString()!))
-    .reduce((acc, i) => acc + i, 0)
-);
+  const counts = {
+    red: 0,
+    green: 0,
+    blue: 0,
+  };
+  let power = 0;
+
+  for (let round of rounds) {
+    const red = parseInt(round.find((draw) => draw[1] === 'red')?.[0] ?? '0');
+    const green = parseInt(round.find((draw) => draw[1] === 'green')?.[0] ?? '0');
+    const blue = parseInt(round.find((draw) => draw[1] === 'blue')?.[0] ?? '0');
+
+    counts.red = red > counts.red ? red : counts.red;
+    counts.green = green > counts.green ? green : counts.green;
+    counts.blue = blue > counts.blue ? blue : counts.blue;
+
+    power = counts.red * counts.blue * counts.green;
+  }
+
+  sum += power;
+}
+
+console.log(sum);
